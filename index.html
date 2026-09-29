@@ -789,6 +789,15 @@
         </button>
       );
 
+      const HomeButton = () => (
+        <button onClick={() => {
+          setStep('HOME');
+          setStepHistory(['HOME']);
+        }} className="absolute top-4 right-4 bg-teal-100/90 px-4 py-2 rounded-full shadow-md font-bold text-teal-800 border-2 border-teal-300 hover:bg-teal-200 z-20 transition-colors">
+          🏠 ホーム
+        </button>
+      );
+
       const renderNoteLines = (ansData, isTeacherScreen = false) => {
         if (!ansData || ansData.length === 0) return null;
         return (
@@ -970,6 +979,7 @@
         content = (
           <div className="min-h-screen p-4 flex flex-col items-center py-12 relative">
             <BackButton />
+            <HomeButton />
             <div className="w-full max-w-xl text-center pb-24">
               <h2 className="text-2xl font-bold text-emerald-700 mb-6 bg-emerald-100 py-2 rounded-full border-2 border-emerald-200 shadow-sm">じぶんのこと を えいごで かこう！</h2>
               
@@ -1061,6 +1071,7 @@
         content = (
           <div className="min-h-screen bg-yellow-50 p-4 flex flex-col items-center py-12 relative">
             <BackButton />
+            <HomeButton />
             <div className="w-full max-w-7xl bg-white p-4 md:p-8 rounded-3xl shadow-xl border-4 border-yellow-300">
               <h2 className="text-3xl font-bold text-yellow-700 mb-6 text-center">📝 ノートに 書きうつそう！</h2>
               <p className="text-center font-bold text-gray-600 mb-6">下の えいごを、じぶんの ノートに 書いてね。<br/>書きおわったら、先生に チェックしてもらおう！</p>
@@ -1087,6 +1098,7 @@
         content = (
           <div className="min-h-screen bg-gray-200 p-4 flex flex-col items-center py-12 relative">
             <BackButton />
+            <HomeButton />
             <div className="w-full max-w-3xl bg-white p-4 md:p-8 rounded-3xl shadow-2xl border-8 border-gray-400 relative">
               <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-gray-600 text-white px-8 py-2 rounded-full font-bold text-xl shadow-md tracking-wider">先生専用 修正画面</div>
               <p className="text-center font-bold text-gray-700 mt-6 mb-6">児童のノートを確認し、必要であれば以下の英文を手直ししてください。<br/>修正内容はスライドに反映されます。</p>
@@ -1105,6 +1117,7 @@
         content = (
           <div className="min-h-screen bg-green-50 p-4 flex flex-col items-center py-8 relative">
             <BackButton />
+            <HomeButton />
             <div className="w-full max-w-2xl bg-white p-8 rounded-3xl shadow-xl border-4 border-green-300 text-center mt-8">
               <h2 className="text-3xl font-bold text-green-700 mb-6">🗣️ えいごで はなす れんしゅう</h2>
               <div className="space-y-4 mb-8">
@@ -1153,6 +1166,7 @@
         content = (
           <div className="min-h-screen p-4 flex flex-col items-center py-12 relative bg-teal-50">
             <BackButton />
+            <HomeButton />
             <div className="w-full max-w-3xl bg-white p-6 md:p-8 rounded-3xl shadow-xl border-4 border-teal-200">
               <h2 className="text-2xl font-bold text-teal-700 mb-6 text-center">スライドに使う がぞうを さがそう🖼️</h2>
               
@@ -1207,6 +1221,7 @@
         if (quizStatus === 'result') {
           content = (
             <div className="min-h-screen bg-orange-50 p-4 flex flex-col items-center justify-center relative">
+               <HomeButton />
                <div className="bg-white p-8 rounded-3xl shadow-xl text-center border-4 border-orange-300 max-w-md w-full animate-bounce-in">
                  <h2 className="text-3xl font-bold text-orange-600 mb-4">クイズ おわり！</h2>
                  <p className="text-2xl font-bold text-gray-700 mb-6">10問中 <span className="text-4xl text-red-500">{quizScore}</span>問 正解！</p>
@@ -1220,6 +1235,7 @@
           content = (
             <div className="min-h-screen bg-orange-50 p-4 flex flex-col items-center py-12 relative">
               <BackButton />
+              <HomeButton />
               <div className="w-full max-w-2xl bg-white p-6 md:p-8 rounded-3xl shadow-xl border-4 border-orange-300">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold text-orange-700">英単語クイズ</h2>
@@ -1309,6 +1325,7 @@
         content = (
           <div className="min-h-screen bg-green-50 p-4 flex items-center justify-center relative">
             <BackButton />
+            <HomeButton />
             <div className="max-w-lg w-full bg-white rounded-3xl shadow-xl p-8 text-center border-4 border-green-200 mt-12">
               <h2 className="text-3xl font-bold text-green-600 mb-6">コインあつめ ゲーム！</h2>
               <div className="bg-green-100 p-6 rounded-2xl mb-8">
@@ -1335,6 +1352,7 @@
       } else if (step === 'GAME') {
          content = (
            <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4 relative">
+              <HomeButton />
               <CoinGame playerEmoji={currentStage.emoji} helpers={helpers} onFinish={(coins) => {
                 handleGameFinish(coins);
                 goToStep('FRIEND_SHARE');
@@ -1344,6 +1362,7 @@
       } else if (step === 'FRIEND_SHARE') {
         content = (
           <div className="min-h-screen bg-teal-50 p-4 flex items-center justify-center relative">
+            <HomeButton />
             <div className="max-w-lg w-full bg-white rounded-3xl shadow-xl p-8 text-center border-4 border-teal-200 animate-fade-in-up">
               <h2 className="text-3xl font-bold text-teal-600 mb-6">ゲーム おつかれさま！</h2>
               <div className="text-6xl mb-6">🎉</div>
@@ -1387,12 +1406,19 @@
           <div id="slide-fullscreen-container" className="fixed inset-0 bg-black flex flex-col z-50">
             <div className="flex-1 flex items-center justify-center p-2 md:p-8">
               <div className="w-full h-full max-h-[70vh] max-w-5xl slide-bg rounded-xl md:rounded-3xl shadow-[0_0_50px_rgba(255,255,255,0.2)] overflow-hidden relative flex flex-col border-4 border-gray-800">
-                {currentSlideIndex === workData.answers.length - 1 && (
+                {currentSlideIndex === workData.answers.length - 1 ? (
                   <button onClick={() => { 
                     if (document.fullscreenElement) document.exitFullscreen(); 
                     setStep('HOME'); setStepHistory(['HOME']); setViewingWork(null); 
                   }} className="absolute top-4 left-4 bg-red-500 text-white px-6 py-3 rounded-full font-bold z-10 shadow-lg hover:bg-red-600 animate-pulse border-2 border-white">
                     ✖ 近くの友だちに スライドを見せた！
+                  </button>
+                ) : (
+                  <button onClick={() => { 
+                    if (document.fullscreenElement) document.exitFullscreen(); 
+                    setStep('HOME'); setStepHistory(['HOME']); setViewingWork(null); 
+                  }} className="absolute top-4 left-4 bg-gray-800/80 text-white px-4 py-2 rounded-full font-bold z-10 shadow-lg hover:bg-gray-700 border border-gray-600 backdrop-blur">
+                    🏠 ホーム
                   </button>
                 )}
                 
@@ -1429,6 +1455,7 @@
         content = (
           <div className="min-h-screen bg-yellow-50 p-4 flex flex-col items-center py-12 relative">
             <BackButton />
+            <HomeButton />
             <div className="w-full max-w-3xl bg-white p-4 md:p-8 rounded-3xl shadow-xl border-4 border-yellow-300 relative">
               <h2 className="text-2xl font-bold text-gray-700 mb-6">📑 {viewingWork.date} のノート</h2>
               <div className="bg-white border-2 border-gray-300 p-2 md:p-8 rounded-xl shadow-inner mb-4 overflow-hidden">
