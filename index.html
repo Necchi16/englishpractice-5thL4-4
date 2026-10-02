@@ -368,7 +368,7 @@
           
           <div className="grid grid-cols-3 gap-2 mt-4 md:hidden w-full max-w-[250px]">
             <div />
-            <button onPointerDown={() => handleBtn('ArrowUp', true)} onPointerUp={() => handleBtn('ArrowUp', false)} onPointerLeave={() => handleBtn('ArrowUp', false)} className="bg-gray-700 text-white p-4 rounded-xl text-2xl active:bg-teal-600 flex items-center justify-center">⬆️</button>
+            <button onPointerDown={() => handleBtn('ArrowUp', true)} onPointerUp={() => handleBtn('ArrowUp', false)} onPointerLeave={() => handleBtn('ArrowUp', false)} className="bg-gray-700 text-white p-4 rounded-xl text-2xl active:bg-teal-600 flex items-center justify-center">⬆️️</button>
             <div />
             <button onPointerDown={() => handleBtn('ArrowLeft', true)} onPointerUp={() => handleBtn('ArrowLeft', false)} onPointerLeave={() => handleBtn('ArrowLeft', false)} className="bg-gray-700 text-white p-4 rounded-xl text-2xl active:bg-teal-600 flex items-center justify-center">⬅️</button>
             <button onPointerDown={() => handleBtn('ArrowDown', true)} onPointerUp={() => handleBtn('ArrowDown', false)} onPointerLeave={() => handleBtn('ArrowDown', false)} className="bg-gray-700 text-white p-4 rounded-xl text-2xl active:bg-teal-600 flex items-center justify-center">⬇️</button>
@@ -402,6 +402,7 @@
       const [savedWorks, setSavedWorks] = useState([]);
       const [viewingWork, setViewingWork] = useState(null);
       const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+      const [afterSlideshowStep, setAfterSlideshowStep] = useState(null); // スライド発表画面終了後の遷移先
 
       const [currentSpeakLine, setCurrentSpeakLine] = useState(0);
       const [isListening, setIsListening] = useState(false);
@@ -434,7 +435,6 @@
         const storedDishesStr = localStorage.getItem('myBestMemoryDishes_V1');
         if (storedDishesStr) {
           const arr = JSON.parse(storedDishesStr);
-          // 互換性のため文字列のまま保存し、表示時にルビを結合する方針
           setCookedDishes(arr.map(d => typeof d === 'string' ? d : d.name));
         }
       }, []);
@@ -793,6 +793,7 @@
         <button onClick={() => {
           setStep('HOME');
           setStepHistory(['HOME']);
+          setAfterSlideshowStep(null);
         }} className="absolute top-4 right-4 bg-teal-100/90 px-4 py-2 rounded-full shadow-md font-bold text-teal-800 border-2 border-teal-300 hover:bg-teal-200 z-20 transition-colors">
           🏠 ホーム
         </button>
@@ -909,6 +910,7 @@
                     ]); 
                     setAnswers(null); setTranslatingState({}); setFallbackMode({}); setManualInputs({}); 
                     setCurrentSpeakLine(0);
+                    setAfterSlideshowStep(null);
                     goToStep('INPUT'); 
                   }} 
                   className="w-full bg-red-500 hover:bg-red-600 text-white text-2xl font-bold py-6 rounded-2xl shadow-lg transform transition hover:scale-105 mb-8">
@@ -1107,56 +1109,7 @@
                 {renderNoteLines(answers, true)}
               </div>
               
-              <button onClick={() => goToStep('SPEAK_PRACTICE')} className="w-full bg-green-500 text-white text-xl font-bold py-5 rounded-2xl shadow-lg">✅ チェック完了（練習へすすむ）</button>
-            </div>
-          </div>
-        );
-      } else if (step === 'SPEAK_PRACTICE') {
-        const isAllDone = currentSpeakLine >= answers.length;
-        
-        content = (
-          <div className="min-h-screen bg-green-50 p-4 flex flex-col items-center py-8 relative">
-            <BackButton />
-            <HomeButton />
-            <div className="w-full max-w-2xl bg-white p-8 rounded-3xl shadow-xl border-4 border-green-300 text-center mt-8">
-              <h2 className="text-3xl font-bold text-green-700 mb-6">🗣️ えいごで はなす れんしゅう</h2>
-              <div className="space-y-4 mb-8">
-                {answers.map((ans, idx) => {
-                  const isActive = idx === currentSpeakLine;
-                  const isDone = idx < currentSpeakLine;
-                  const sentence = `${ans.prefix}${ans.en}${ans.suffix}`;
-                  return (
-                    <div key={idx} className={`p-4 rounded-xl border-2 text-left flex justify-between items-center transition-all ${isActive ? 'bg-green-100 border-green-400 transform scale-105 shadow-md' : isDone ? 'bg-gray-100 border-gray-200 opacity-50' : 'bg-white border-gray-200 opacity-40'}`}>
-                      <span className={`text-xl md:text-2xl font-bold font-note ${isDone ? 'line-through text-gray-500' : 'text-gray-800'}`}>{idx+1}. {sentence}</span>
-                      {isActive && <button onClick={() => speak(sentence)} className="bg-white p-3 rounded-full text-green-600 shadow border border-green-200">🔊</button>}
-                      {isDone && <span className="text-green-500 text-3xl">✓</span>}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {!isAllDone ? (
-                <div>
-                  <button onClick={() => {
-                     const ans = answers[currentSpeakLine];
-                     startListening(`${ans.prefix}${ans.en}${ans.suffix}`);
-                  }} disabled={isListening} className={`w-24 h-24 rounded-full shadow-lg text-4xl mb-4 ${isListening ? 'bg-red-500 animate-pulse' : 'bg-teal-500 hover:bg-teal-600'} text-white transition`}>🎤</button>
-                  <p className="font-bold text-gray-600">{isListening ? "はなしてね..." : "マイクをおして はなす"}</p>
-                  {feedbackMsg && <div className="mt-4 p-4 rounded-xl font-bold text-lg border-2 bg-white whitespace-pre-line">{feedbackMsg}</div>}
-                  
-                  {failCount >= 3 && (
-                    <div className="mt-6 animate-fade-in-up w-full flex flex-col items-center">
-                        <p className="text-sm text-gray-500 mb-2 font-bold">むずかしい場合はスキップできます。</p>
-                        <button onClick={() => { setCurrentSpeakLine(c => c+1); setFailCount(0); setFeedbackMsg(""); }} className="text-sm bg-gray-200 hover:bg-gray-300 px-6 py-3 rounded-full font-bold transition text-gray-700 shadow-sm border border-gray-300">⏭️ スキップして次へ</button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="animate-bounce-in">
-                  <p className="text-2xl font-bold text-orange-500 mb-6">ぜんぶ 言えたね！🎉</p>
-                  <button onClick={() => goToStep('IMAGE_INPUT')} className="w-full bg-blue-500 hover:bg-blue-600 text-white text-2xl font-bold py-6 rounded-2xl shadow-xl transition transform hover:scale-105 flex items-center justify-center gap-2"><span>🖼️</span> つぎは 画像さがし！ ▶️</button>
-                </div>
-              )}
+              <button onClick={() => goToStep('IMAGE_INPUT')} className="w-full bg-green-500 text-white text-xl font-bold py-5 rounded-2xl shadow-lg">✅ チェック完了（画像さがしへすすむ）</button>
             </div>
           </div>
         );
@@ -1203,15 +1156,71 @@
               </div>
               <button onClick={() => { 
                   if (canProceedToQuiz) {
-                    initQuiz(); 
-                    goToStep('QUIZ'); 
+                    const workData = { date: new Date().toLocaleString(), answers };
+                    saveWork(workData); // スライドを保存
+                    setViewingWork(workData); // プレビュー用データとしてセット
+                    setAfterSlideshowStep('SPEAK_PRACTICE'); // スライド画面が終わったあとの行き先
+                    setCurrentSlideIndex(0);
+                    goToStep('VIEW_SLIDESHOW'); 
                   } else {
                     alert("すべての画像の「画像アドレス」を入れてね！");
                   }
                 }} 
                 className={`w-full mt-8 text-white text-xl font-bold py-5 rounded-2xl shadow-lg transition transform ${canProceedToQuiz ? 'bg-blue-500 hover:bg-blue-600 hover:-translate-y-1' : 'bg-gray-400 cursor-not-allowed'}`}>
-                がぞうを いれた！ ▶️
+                スライドを かんせいさせる！ ▶️
               </button>
+            </div>
+          </div>
+        );
+      } else if (step === 'SPEAK_PRACTICE') {
+        const isAllDone = currentSpeakLine >= answers.length;
+        
+        content = (
+          <div className="min-h-screen bg-green-50 p-4 flex flex-col items-center py-8 relative">
+            <BackButton />
+            <HomeButton />
+            <div className="w-full max-w-2xl bg-white p-8 rounded-3xl shadow-xl border-4 border-green-300 text-center mt-8">
+              <h2 className="text-3xl font-bold text-green-700 mb-6">🗣️ えいごで はなす れんしゅう</h2>
+              <div className="space-y-4 mb-8">
+                {answers.map((ans, idx) => {
+                  const isActive = idx === currentSpeakLine;
+                  const isDone = idx < currentSpeakLine;
+                  const sentence = `${ans.prefix}${ans.en}${ans.suffix}`;
+                  return (
+                    <div key={idx} className={`p-4 rounded-xl border-2 text-left flex justify-between items-center transition-all ${isActive ? 'bg-green-100 border-green-400 transform scale-105 shadow-md' : isDone ? 'bg-gray-100 border-gray-200 opacity-50' : 'bg-white border-gray-200 opacity-40'}`}>
+                      <span className={`text-xl md:text-2xl font-bold font-note ${isDone ? 'line-through text-gray-500' : 'text-gray-800'}`}>{idx+1}. {sentence}</span>
+                      {isActive && <button onClick={() => speak(sentence)} className="bg-white p-3 rounded-full text-green-600 shadow border border-green-200">🔊</button>}
+                      {isDone && <span className="text-green-500 text-3xl">✓</span>}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {!isAllDone ? (
+                <div>
+                  <button onClick={() => {
+                     const ans = answers[currentSpeakLine];
+                     startListening(`${ans.prefix}${ans.en}${ans.suffix}`);
+                  }} disabled={isListening} className={`w-24 h-24 rounded-full shadow-lg text-4xl mb-4 ${isListening ? 'bg-red-500 animate-pulse' : 'bg-teal-500 hover:bg-teal-600'} text-white transition`}>🎤</button>
+                  <p className="font-bold text-gray-600">{isListening ? "はなしてね..." : "マイクをおして はなす"}</p>
+                  {feedbackMsg && <div className="mt-4 p-4 rounded-xl font-bold text-lg border-2 bg-white whitespace-pre-line">{feedbackMsg}</div>}
+                  
+                  {failCount >= 3 && (
+                    <div className="mt-6 animate-fade-in-up w-full flex flex-col items-center">
+                        <p className="text-sm text-gray-500 mb-2 font-bold">むずかしい場合はスキップできます。</p>
+                        <button onClick={() => { setCurrentSpeakLine(c => c+1); setFailCount(0); setFeedbackMsg(""); }} className="text-sm bg-gray-200 hover:bg-gray-300 px-6 py-3 rounded-full font-bold transition text-gray-700 shadow-sm border border-gray-300">⏭️ スキップして次へ</button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="animate-bounce-in">
+                  <p className="text-2xl font-bold text-orange-500 mb-6">ぜんぶ 言えたね！🎉</p>
+                  <button onClick={() => {
+                      initQuiz();
+                      goToStep('QUIZ');
+                  }} className="w-full bg-blue-500 hover:bg-blue-600 text-white text-2xl font-bold py-6 rounded-2xl shadow-xl transition transform hover:scale-105 flex items-center justify-center gap-2"><span>📝</span> つぎは 英単語クイズ！ ▶️️</button>
+                </div>
+              )}
             </div>
           </div>
         );
@@ -1314,7 +1323,7 @@
                 )}
                 {quizStatus === 'skipped' && (
                    <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
-                      <div className="text-9xl animate-bounce-in drop-shadow-2xl">⏭️</div>
+                      <div className="text-9xl animate-bounce-in drop-shadow-2xl">⏭️️</div>
                    </div>
                 )}
               </div>
@@ -1377,8 +1386,8 @@
               
               <button onClick={() => {
                 const workData = { date: new Date().toLocaleString(), answers };
-                saveWork(workData);
-                setViewingWork(workData);
+                setViewingWork(workData); // プレビュー用としてセット（保存自体は画像入力時に済んでいる想定）
+                setAfterSlideshowStep('HOME');
                 goToStep('VIEW_SLIDESHOW');
                 setCurrentSlideIndex(0);
               }} className="bg-blue-500 hover:bg-blue-600 text-white text-xl font-bold py-5 px-8 rounded-full flex items-center justify-center mx-auto shadow-md transform transition hover:scale-105 w-full">
@@ -1409,14 +1418,20 @@
                 {currentSlideIndex === workData.answers.length - 1 ? (
                   <button onClick={() => { 
                     if (document.fullscreenElement) document.exitFullscreen(); 
-                    setStep('HOME'); setStepHistory(['HOME']); setViewingWork(null); 
+                    if (afterSlideshowStep) {
+                      goToStep(afterSlideshowStep);
+                    } else {
+                      setStep('HOME'); setStepHistory(['HOME']); 
+                    }
+                    setViewingWork(null);
+                    setAfterSlideshowStep(null);
                   }} className="absolute top-4 left-4 bg-red-500 text-white px-6 py-3 rounded-full font-bold z-10 shadow-lg hover:bg-red-600 animate-pulse border-2 border-white">
-                    ✖ 近くの友だちに スライドを見せた！
+                    {afterSlideshowStep === 'SPEAK_PRACTICE' ? '🗣️ 発表おわり！話す練習へ ▶' : '✖ 近くの友だちに スライドを見せた！'}
                   </button>
                 ) : (
                   <button onClick={() => { 
                     if (document.fullscreenElement) document.exitFullscreen(); 
-                    setStep('HOME'); setStepHistory(['HOME']); setViewingWork(null); 
+                    setStep('HOME'); setStepHistory(['HOME']); setViewingWork(null); setAfterSlideshowStep(null);
                   }} className="absolute top-4 left-4 bg-gray-800/80 text-white px-4 py-2 rounded-full font-bold z-10 shadow-lg hover:bg-gray-700 border border-gray-600 backdrop-blur">
                     🏠 ホーム
                   </button>
